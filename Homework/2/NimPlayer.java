@@ -1,6 +1,7 @@
 package nim;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Stack;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ public class NimPlayer {
         this.MAX_REMOVAL = MAX_REMOVAL;
     }
     
+    
     /**
      * 
      * @param   remaining   Integer representing the amount of stones left in the pile
@@ -26,19 +28,18 @@ public class NimPlayer {
     public int choose (int remaining) {
         GameTreeNode root = new GameTreeNode(remaining, 0, true);
         Map <GameTreeNode, Integer> memoBank = new HashMap<GameTreeNode, Integer>();
+        int action = 0;
                 
     	alphaBetaMinimax(root, Integer.MAX_VALUE, Integer.MIN_VALUE, true, memoBank);
     	
     	for  (int i = 0; i < root.children.size(); i++) {
-    		GameTreeNode curr = root.children.get(i);
-    	    if (curr.score == 1) {
-    	    	return curr.action;
-    	    } else {
-    	    	return 1;
-    	    }
-    	}
-    	
-    		
+            GameTreeNode curr = root.children.get(i);
+            if (curr.score == 1) {
+                return curr.action;
+            } else {
+                return 1;
+            }
+        }	
     	//The call to alphaBetaMinMinimax returns an int for a score and
     	//generates our SearchTree. Implement code to select a certain action
     	//path from our tree that will lead to victory
@@ -58,43 +59,61 @@ public class NimPlayer {
      *          from the given node
      */
     private int alphaBetaMinimax (GameTreeNode node, int alpha, int beta, boolean isMax, Map<GameTreeNode, Integer> visited) {
-        Stack<GameTreeNode> frontier = new Stack<GameTreeNode>();
-    	frontier.add(node);
         
+    	Stack<GameTreeNode> frontier = new Stack<GameTreeNode>();
+    	frontier.add(node);
+    	
       	while (frontier.isEmpty() == false) {
-    		
     		GameTreeNode curr = frontier.remove(0);
+			Map<Integer,Integer> moves = curr.getActions(MAX_REMOVAL);    		
   		    	
-    		if (curr.isGoal(visited)) { 
-    			//retrace through every node above goal node and score the path
-    			//node score = off # of actions between node and goal
-    			//adding to visited <GameTreeNode, score>
-    			
-    			GameTreeNode retrace = curr;
-    			while (retrace.isMax == false) {
-    				
-    				
-    				
-    				retrace = retrace;
+    		if (curr.isGoal(visited)) {  				
+    			if (visited.containsKey(curr)) {
+					curr.score=visited.get(curr);
+			    }    			
+    			if (curr.remaining == 0) {
+    				if (isMax) {
+    					curr.score = 1;
+    				}
+    				else curr.score =0; 
     			}
-    			
-    		}	
-    	
-            Map<Integer,GameTreeNode> moves = curr.getActions(MAX_REMOVAL);
-
-            //when expanding, after a node is generated and added to the frontier
-            //the node should also be added to curr.Children (arrayList of children)
-    	
-            
-    	
-    	
-    	
-    	
-    	}
-    	
-    		
-    	
-    return 1;	
+    		return curr.score;
+    		} else if (isMax) {    	            
+    	        for (Map.Entry<Integer, Integer> actions : moves.entrySet()) {          	
+    	        	GameTreeNode temp = new GameTreeNode(actions.getKey(),actions.getValue(), !curr.isMax);            	
+    	               	
+    	        	if (visited.containsKey(temp)==false) {
+    	        		frontier.add(temp);
+    	        		curr.children.add(temp);
+    	            		
+    	        		temp.score = Math.max(0, alphaBetaMinimax(temp, alpha, beta, false, visited));
+    	        		alpha = Math.max(alpha, temp.score);
+    	        		if (beta <= alpha) 
+    	        			break;
+    	        		visited.put(temp, temp.score);
+    	        		return temp.score;
+    	            }
+    	        }
+    	    } else {
+    	         for (Map.Entry<Integer, Integer> actions : moves.entrySet()) {          	
+    	        	 GameTreeNode temp = new GameTreeNode(actions.getKey(),actions.getValue(), !curr.isMax);            	
+        	               	
+    	        	 if (visited.containsKey(temp)==false) {
+    	        		 frontier.add(temp);
+    	        		 curr.children.add(temp);
+        	            		
+    	        		 temp.score = Math.min(1, alphaBetaMinimax(temp, alpha, beta, true, visited));
+    	        		 beta = Math.min(beta, temp.score);
+    	        		 if (beta <= alpha) 
+        	            	break;
+    	        		 visited.put(temp, temp.score);
+    	        		 return temp.score;    	            	
+    	        	 }
+    	          }
+    	    }
+    }	   			
+    	    	
+    return node.score;
     }
     
     
@@ -143,12 +162,11 @@ class GameTreeNode {
         return remaining + ((isMax) ? 1 : 0);
     }
     
-    public Map<Integer, GameTreeNode> getActions(int max){
+    public Map<Integer, Integer> getActions(int max){
     	int r = this.remaining;
-    	Map<Integer, GameTreeNode> possActions = new HashMap<Integer, GameTreeNode>();
+    	Map<Integer, Integer> possActions = new HashMap<Integer, Integer>();
     	for (int stoneRemoval = 1; stoneRemoval <= max && stoneRemoval <= r; stoneRemoval++) {
-    		GameTreeNode temp = new GameTreeNode(r-stoneRemoval, stoneRemoval, false);
-    		possActions.put(temp.action, temp);
+    		possActions.put(stoneRemoval, r - stoneRemoval);
     	}
     	return possActions;
     	
@@ -157,8 +175,6 @@ class GameTreeNode {
     public boolean isGoal(Map<GameTreeNode, Integer> visited) {	
     	return (this.remaining == 0 || visited.containsKey(this));    	
     }
-      
-        
     
-	}   
+}   
 }
