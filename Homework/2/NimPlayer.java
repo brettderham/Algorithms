@@ -28,21 +28,17 @@ public class NimPlayer {
         Map <GameTreeNode, Integer> memoBank = new HashMap<GameTreeNode, Integer>();
                 
     	alphaBetaMinimax(root, Integer.MAX_VALUE, Integer.MIN_VALUE, true, memoBank);
-    	while (memoBank.isEmpty() == false) {
-    		if (remaining <= 3) {
-    			root.action = remaining;
-    			return root.action;
-    	    } else if (remaining == 4 | remaining == 5) {
-    		    root.action = 1;
-    		    return root.action;
-    	    } else if (remaining == 6) {
-    		    root.action = 2;
-    		    return root.action;
+    	
+    	for  (int i = 0; i < root.children.size(); i++) {
+    		GameTreeNode curr = root.children.get(i);
+    	    if (curr.score == 1) {
+    	    	return curr.action;
     	    } else {
-    		    root.action = 3;
-    		    return root.action;
+    	    	return 1;
     	    }
-        }
+    	}
+    	
+    		
     	//The call to alphaBetaMinMinimax returns an int for a score and
     	//generates our SearchTree. Implement code to select a certain action
     	//path from our tree that will lead to victory
