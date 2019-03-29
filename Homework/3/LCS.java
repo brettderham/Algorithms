@@ -11,6 +11,8 @@ public class LCS {
      */
     public static int[][] memoCheck;
     
+    
+    
     // -----------------------------------------------
     // Shared Helper Methods
     // -----------------------------------------------
@@ -21,6 +23,7 @@ public class LCS {
     // -----------------------------------------------
     // Bottom-Up LCS
     // -----------------------------------------------
+    
     
     /**
      * Bottom-up dynamic programming approach to the LCS problem, which
@@ -33,61 +36,40 @@ public class LCS {
      */
     // Returns length of LCS for X[0..m-1], Y[0..n-1] 
     public static Set<String> bottomUpLCS (String rStr, String cStr) {
-    	int[][] lcs = new int [rStr.length()+1][cStr.length()+1];
-    	int m = rStr.length();
-    	int n = cStr.length();
-    	String[][] solution = new String[m][n];
-    	for (int i = 0; i <= n; i++) {
-			lcs[0][i] = 0;
-			solution[0][i] = "0";
-		}
-
-		// if B is null then LCS of A, B =0
-		for (int i = 0; i <= m; i++) {
-			lcs[i][0] = 0;
-			solution[i][0] = "0";
-		}
-		
-		for (int i = 1; i <= m; i++) {
-			for (int j = 1; j <= n; j++) {
-				if (rStr.charAt(m - 1) == cStr.charAt(n - 1)) {
-					lcs[i][j] = lcs[i - 1][j - 1] + 1;
-					solution[i][j] = "diagonal";
-				} else {
-					lcs[i][j] = Math.max(lcs[i - 1][j], lcs[i][j - 1]);
-					if (lcs[i][j] == lcs[i - 1][j]) {
-						solution[i][j] = "top";
-					} else {
-						solution[i][j] = "left";
-					}
-				}
-			}
-		}
-		
-		String x = solution[m][n];
-		String answer = "";
-		while (x != "0") {
-			if (solution[m][n] == "diagonal") {
-				answer = rStr.charAt(m - 1) + answer;
-				m--;
-				n--;
-			} else if (solution[m][n] == "left") {
-				n--;
-			} else if (solution[m][n] == "top") {
-				m--;
-			}
-			x = solution[m][n];
-		}
-		System.out.println(answer);
-		
-		for (int i = 0; i <= m; i++) {
-			for (int j = 0; j <= n; j++) {
-				System.out.print(" " + lcs[i][j]);
-			}
-			System.out.println();
-		}
-		return lcs[m][n];
+    	int[][] memo = new int [rStr.length()+1][cStr.length()+1];
+    	
+    	int longestSubstring = lcs(rStr, cStr, rStr.length(), cStr.length(), memo);
+    	memoCheck = memo;
+    	
+    	for (int[] x : memo)
+    	{
+    	   for (int y : x)
+    	   {
+    	        System.out.print(y + " ");
+    	   }
+    	   System.out.println();
+    	}  	
+        throw new UnsupportedOperationException();
     }
+    
+    static int lcs( String rStr, String cStr, int rInd, int cInd, int memo[][]) { 
+    
+      for (int i=0; i<=rInd; i++) 
+      { 
+        for (int j=0; j<=cInd; j++) 
+        { 
+          if (i == 0 || j == 0) 
+              memo[i][j] = 0; 
+          else if (rStr.charAt(rInd - 1) == cStr.charAt(rInd - 1)) 
+              memo[i][j] = 1 + memo[i-1][j-1]; 
+          else
+              memo[i][j] = Math.max(memo[i-1][j], memo[i][j-1]); 
+        } 
+      }
+      return memo[rInd][cInd];
+    }
+ 
+ 
     // [!] TODO: Add any bottom-up specific helpers here!
     
     
