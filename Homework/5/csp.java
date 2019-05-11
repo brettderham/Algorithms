@@ -1,3 +1,42 @@
+/** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *  File name     :  CSP.java
+ *  Purpose       :  Provides a class describing a Maze Problem and methods to solve
+ *  @author       :  Sebastian Grasso / Brett Derham
+ *  Date          :  2019-05-10 
+ *  Description   :  Csp class that performs backtracking and implements consistency.
+ *                   Includes the following:
+ *                   
+ *                  public static List<LocalDate> solve (int nMeetings, LocalDate rangeStart, LocalDate rangeEnd, Set<DateConstraint> constraints)
+ *                   // Solves the csp problem and returns a solution in which all constraints are satisfied.
+ *                   
+ *                   public static BinaryDateConstraint flip(BinaryDateConstraint i)
+ *                   // Changes a binary constraint into a unary constraint
+ *                   
+ *                   public static void nodeConsistency(Meeting meeting, UnaryDateConstraint constraint)
+ *                   // Method that prunes invalid values from dateRange
+ *                   
+ *                  public static void arcConsistency(Meeting tail, Meeting head, BinaryDateConstraint constraint)
+ *                   // Prunes invalid values from tail's dateRange
+ *                   
+ *                  public static boolean testSolution (List<LocalDate> solution, Set<DateConstraint> constraints)
+ *                   // Checks to see if a solution satisfies all constraints
+ *                   
+ *                  public static boolean metConstraint(LocalDate leftDate, DateConstraint constraint, LocalDate rightDate)
+ *                  // Returns true when two dates meet constraints
+ *                  
+ *                  public static ArrayList<LocalDate> backtrack(ArrayList<Meeting> meetings, Set<DateConstraint> constraints, ArrayList<LocalDate> assignment, int index)
+ *                  // Finds solution to csp using backtracking
+ *                
+ *                   
+ *  Warnings      :  None
+ *  Exceptions    :  None
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *  Revision History
+ *  ---------------
+ *            Rev      Date     Modified by:  Reason for change/modification
+ *           -----  ----------  ------------  -----------------------------------------------------------
+ *  @version 1.0.0  2019-05-10  Authors       Finished homework assignment four
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 package csp;
 
 import java.time.LocalDate;
@@ -7,18 +46,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-/**
- * CSP: Calendar Satisfaction Problem Solver
- * Provides a solution for scheduling some n meetings in a given
- * period of time and according to some unary and binary constraints
- * on the dates of each meeting.
- */
 public class CSP {
 	
-	 /**
-     * Public interface for the CSP solver in which the number of meetings,
-     * range of allowable dates for each meeting, and constraints on meeting
-     * times are specified.
+	/**
+     * Solves the csp problem and returns a solution in which all constraints are satisfied.
      * @param nMeetings The number of meetings that must be scheduled, indexed from 0 to n-1
      * @param rangeStart The start date (inclusive) of the domains of each of the n meeting-variables
      * @param rangeEnd The end date (inclusive) of the domains of each of the n meeting-variables
@@ -80,11 +111,8 @@ public class CSP {
     }
     
 	/**
-	 * Flips a binary constraint into a unary constraint
-	 * @param int index of meeting that has been assigned
-	 * @param LocalDate that meeting has been assigned to
-	 * @param Set<DateConstraints> to adjust
-	 * @return Set<DateConstraints> where binary constraints containing the assigned meeting have been changed to unary constraints 
+	 * Changes a binary constraint into a unary constraint
+	 * @param i Given binary constraint
 	 */
 	public static BinaryDateConstraint flip(BinaryDateConstraint i) {
 		String[] operators = {"==", "!=", "<", "<=", ">", ">="};
@@ -99,9 +127,9 @@ public class CSP {
 	}
       
     /**
-	 * Method that prunes invalid values from a variables domain
-	 * @param meeting Meeting being constrained
-	 * @param constraint UnaryConstraint to check consistency of
+	 * Method that prunes invalid values from dateRange
+	 * @param meeting Meeting values
+	 * @param constraint UnaryConstraint being checked
 	 */
 	public static void nodeConsistency(Meeting meeting, UnaryDateConstraint constraint) {	
 		ArrayList<LocalDate> bad = new ArrayList<>();
@@ -118,10 +146,10 @@ public class CSP {
 	}
 	
 	/**
-	 * Prunes invalid values from tail's domain (assumes tail will be on left side of constraint)
-	 * @param Meeting tail
-	 * @param Meeting head
-	 * @param BinaryDateConstraint to satisfy
+	 * Prunes invalid values from tail's dateRange
+	 * @param tail Meeting tail
+	 * @param head Meeting head
+	 * @param constraint BinaryDateConstraint needed to satisfy
 	 */
 	public static void arcConsistency(Meeting tail, Meeting head, BinaryDateConstraint constraint) {
 		ArrayList<LocalDate> good = new ArrayList<>();
@@ -140,10 +168,10 @@ public class CSP {
 	}
 	
 	/**
-     * Tests whether a given solution to a CSP satisfies all constraints or not
-     * @param solution Full instantiation of variables to assigned values, indexed by variable
-     * @param constraints The set of constraints the solution must satisfy
-     * @return true if all constraints are satisfied, false otherwise
+     * Checks to see if a solution satisfies all constraints
+     * @param solution Possible solution
+     * @param constraints The set of constraints for solution
+     * @return true if constraints are met
      */
     public static boolean testSolution (List<LocalDate> solution, Set<DateConstraint> constraints) {
         for (DateConstraint i : constraints) {
@@ -160,10 +188,10 @@ public class CSP {
     }
 	
 	/**
-     * Given two dates, returns whether the dates satisfy the given constraint
-     * @param LocalDate date on left side of equality
-     * @param DateConstraint holding constraint operator
-     * @param LocalDate date on right side of equality
+     * Returns true when two dates meet constraints
+     * @param LocalDate First date
+     * @param DateConstraint Constraint being applied
+     * @param LocalDate Second Date
      */
     public static boolean metConstraint(LocalDate leftDate, DateConstraint constraint, LocalDate rightDate) {
     	 boolean isSatisfied = false;
@@ -180,10 +208,10 @@ public class CSP {
     
     
     /**
-     * Returns solution to a CSP using backtracking
-     * @param ArrayList<Meeting> holds variables, their domains, and their relevant constraints
-     * @param Set<DateConstraint> constraints to be satisfied
-     * @return List<LocalDate> assignment of dates to meetings
+     * Finds solution to csp using backtracking
+     * @param ArrayList<Meeting> Holds all Meeting values
+     * @param Set<DateConstraint> Constraints being applied
+     * @return List<LocalDate> List of assignments
      */
    public static ArrayList<LocalDate> backtrack(ArrayList<Meeting> meetings, Set<DateConstraint> constraints, ArrayList<LocalDate> assignment, int index) {
    	if (testSolution(assignment, constraints) && !assignment.contains(null)) {
